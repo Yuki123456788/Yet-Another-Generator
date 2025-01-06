@@ -28,11 +28,12 @@ export const ImageUpload = ({ handleImageUploading, handleImageKeysChange }: Ima
     if (imageKeys.length > 0) {
       handleImageKeysChange(imageKeys);
     };
-    console.log(imageKeys);
   }, [imageKeys, handleImageKeysChange]);
 
   const handleDeleteImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
+    imageKeys.splice(index, 1);
+    handleImageKeysChange(imageKeys); 
     setImages(newImages);
   };
 
