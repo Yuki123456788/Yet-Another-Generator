@@ -56,7 +56,7 @@ const App = () => {
     style: style,
     role: role,
     length: length,
-    textinfo: textInfo,
+    textInfo: textInfo,
   };
   
   const { mutate: getArticle, data, isLoading: getArticleLoading } = useGetArticle();

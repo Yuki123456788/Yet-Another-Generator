@@ -8,7 +8,7 @@ interface GetArticleParams {
   style: string;
   length: number;
   role: string;
-  textinfo: string;
+  textInfo: string;
 }
 
 interface GetArticleResponse {
