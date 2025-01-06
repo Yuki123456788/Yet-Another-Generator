@@ -31,7 +31,8 @@ const App = () => {
   const [imagesUploading, setImagesUploading] = useState(false);
 
   const handleImageKeysChange = useCallback((newKeys: string[]) => {
-    setImageKeys(prevKeys => [...prevKeys, ...newKeys]);
+    setImageKeys(newKeys);
+    //setImageKeys(prevKeys => [...prevKeys, ...newKeys]);
   }, []);
 
   const handleImageUploading = (isUploading: boolean) => {
@@ -60,6 +61,7 @@ const App = () => {
   
   const { mutate: getArticle, data, isLoading: getArticleLoading } = useGetArticle();
   const handleGenerate = () => {
+    setContent('');
     console.log(params);
     getArticle(params);
   };
@@ -167,7 +169,7 @@ const App = () => {
         </Grid2>
         <Grid2 display={'flex'} justifyContent={'center'} size={12}>
           <Grid2 direction={'row'} alignItems={'center'} container spacing={2}>
-            <Button variant="contained" color="primary" onClick={handleGenerate} disabled={imagesUploading || getArticleLoading}>
+            <Button variant="contained" color="primary" onClick={handleGenerate} disabled={imagesUploading || getArticleLoading || (!textInfo.length && !imageKeys.length)}>
               {imagesUploading || getArticleLoading ? <CircularProgress size={24} /> : 'Go Go'}
             </Button>
             <Button variant='outlined' onClick={handleClear}>
@@ -175,15 +177,15 @@ const App = () => {
             </Button>
           </Grid2>
         </Grid2>
+        <Grid2
+          display={'flex'} justifyContent={'center'} size={12}
+          alignItems="flex-end"
+          style={{ minHeight: '20vh', marginTop: '10px', marginBottom: '20px' }}
+        >
+          <Artical content={content} loading={getArticleLoading} />
+        </Grid2>
       </Grid2>
-      <Grid2
-        container
-        justifyContent="center"
-        alignItems="flex-end"
-        style={{ minHeight: '20vh', marginTop: '10px', marginBottom: '20px' }}
-      >
-        <Artical content={content} loading={getArticleLoading} />
-      </Grid2>
+
     </Container>
   );
 };

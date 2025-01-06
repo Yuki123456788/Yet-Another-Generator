@@ -53,7 +53,7 @@ export const useUploadImages = () => {
     }
 
     // 更新 state
-    setImageKeys(keys);
+    setImageKeys((preKey)=>[... preKey, ...keys]);
   };
 
   return { imageKeys, uploadImages, isLoading };
