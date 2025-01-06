@@ -1,6 +1,7 @@
 import {
   Grid2,
   Container,
+  CircularProgress,
   Typography,
   FormControl,
   InputLabel,
@@ -11,17 +12,63 @@ import {
   Button
 } from '@mui/material';
 // import { Edit } from './features/edit';
-// import { Artical } from './features/artical';
-import { useState } from 'react';
+import { Artical } from './features/artical';
+import { useState, useEffect, useCallback } from 'react';
 import { ImageUpload } from './features/edit/imageUpload/ImageUpload';
+import { useGetArticle } from './hooks';
 
 const App = () => {
-  const [images, setImages] = useState<File[]>([]);
+  const [imageKeys, setImageKeys] = useState<string[]>([]);
   const [language, setLanguage] = useState('zh');
   const [style, setStyle] = useState('formal');
   const [length, setLength] = useState(300);
   const [role, setRole] = useState('organizer');
   const [textInfo, setTextInfo] = useState('');
+
+  const [content, setContent] = useState('');
+  const [uploadImagesKey, setUploadImagesKey] = useState(0);
+
+  const [imagesUploading, setImagesUploading] = useState(false);
+
+  const handleImageKeysChange = useCallback((newKeys: string[]) => {
+    setImageKeys(prevKeys => [...prevKeys, ...newKeys]);
+  }, []);
+
+  const handleImageUploading = (isUploading: boolean) => {
+    setImagesUploading(isUploading);
+  };
+
+  const handleClear = () => {
+    setImageKeys([]);
+    setLanguage('zh');
+    setStyle('formal');
+    setLength(300);
+    setRole('organizer');
+    setTextInfo('');
+    setContent('');
+    setUploadImagesKey(prevKey => prevKey + 1);
+  };
+
+  const params = {
+    imageKeys: imageKeys,
+    language: language,
+    style: style,
+    role: role,
+    length: length,
+    textinfo: textInfo,
+  };
+  
+  const { mutate: getArticle, data, isLoading: getArticleLoading } = useGetArticle();
+  const handleGenerate = () => {
+    console.log(params);
+    getArticle(params);
+  };
+
+  useEffect(() => {
+    if (data) {
+      setContent(data.content);
+    }
+  }, [data]);
 
   return (
     <Container>
@@ -41,9 +88,10 @@ const App = () => {
 
         {/* 圖片上傳區 */}
         <Grid2 size={6}>
-          <ImageUpload 
-            images={images} 
-            onImagesChange={setImages} 
+          <ImageUpload
+            key={uploadImagesKey}
+            handleImageUploading={handleImageUploading}
+            handleImageKeysChange={handleImageKeysChange}
           />
         </Grid2>
 
@@ -87,6 +135,7 @@ const App = () => {
               <MenuItem value="formal">正式</MenuItem>
               <MenuItem value="casual">輕鬆</MenuItem>
               <MenuItem value="funny">😀 趣味</MenuItem>
+              <MenuItem value="inspirational">勵志</MenuItem>
             </Select>
           </FormControl>
         </Grid2>
@@ -116,13 +165,24 @@ const App = () => {
             valueLabelDisplay="auto"
           />
         </Grid2>
-        <Grid2 size={12}>
-          <Grid2 direction={'column'} alignItems={'center'} container spacing={2}>
-            <Button variant="contained" color="primary">
-                    Go Go
+        <Grid2 display={'flex'} justifyContent={'center'} size={12}>
+          <Grid2 direction={'row'} alignItems={'center'} container spacing={2}>
+            <Button variant="contained" color="primary" onClick={handleGenerate} disabled={imagesUploading || getArticleLoading}>
+              {imagesUploading || getArticleLoading ? <CircularProgress size={24} /> : 'Go Go'}
+            </Button>
+            <Button variant='outlined' onClick={handleClear}>
+              Clear
             </Button>
           </Grid2>
         </Grid2>
+      </Grid2>
+      <Grid2
+        container
+        justifyContent="center"
+        alignItems="flex-end"
+        style={{ minHeight: '20vh', marginTop: '10px', marginBottom: '20px' }}
+      >
+        <Artical content={content} loading={getArticleLoading} />
       </Grid2>
     </Container>
   );

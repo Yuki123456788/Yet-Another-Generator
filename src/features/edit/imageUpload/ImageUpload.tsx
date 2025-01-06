@@ -1,23 +1,39 @@
 import { Box, Button, ImageList, ImageListItem, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-// import { useState } from 'react';
+import { useUploadImages } from '../../../hooks';
+import { useState, useEffect } from 'react';
 
 interface ImageUploadProps {
-  images: File[];
-  onImagesChange: (images: File[]) => void;
+  handleImageUploading: (isUploading: boolean) => void;
+  handleImageKeysChange: (keys: string[]) => void;
 }
 
-export const ImageUpload = ({ images, onImagesChange }: ImageUploadProps) => {
+export const ImageUpload = ({ handleImageUploading, handleImageKeysChange }: ImageUploadProps) => {
+  const [images, setImages] = useState<File[]>([]);
+  const { imageKeys, uploadImages, isLoading } = useUploadImages(); // custom hook
+
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newImages = Array.from(event.target.files);
-      onImagesChange([...images, ...newImages]);
+      setImages(prevImages => [...prevImages, ...newImages]);
+      uploadImages(newImages);
     }
   };
 
+  useEffect(() => {
+    handleImageUploading(isLoading);
+  }, [isLoading, handleImageUploading]);
+
+  useEffect(() => {
+    if (imageKeys.length > 0) {
+      handleImageKeysChange(imageKeys);
+    };
+    console.log(imageKeys);
+  }, [imageKeys, handleImageKeysChange]);
+
   const handleDeleteImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
-    onImagesChange(newImages);
+    setImages(newImages);
   };
 
   return (
@@ -64,6 +80,7 @@ export const ImageUpload = ({ images, onImagesChange }: ImageUploadProps) => {
                     '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.9)' }
                   }}
                   onClick={() => handleDeleteImage(index)}
+                  disabled={isLoading}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -72,7 +89,6 @@ export const ImageUpload = ({ images, onImagesChange }: ImageUploadProps) => {
           </ImageList>
         )}
       </Box>
-      
     </Box>
   );
 };

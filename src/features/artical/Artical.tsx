@@ -1,29 +1,47 @@
 import {
   Box,
   TextField,
+  IconButton,
+  InputAdornment,
+  CircularProgress
 } from '@mui/material';
+import { ContentCopy } from '@mui/icons-material';
 
+export const Artical = ({ content, loading }: {content: string, loading: boolean}) => {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+  };
 
-export const Artical = () => {
   return (
     <Box sx={{
       width: '80%',
-      borderRadius: '5px'
+      borderRadius: '5px',
     }}>
-      <TextField
-        id="outlined-multiline-static"
-        label="Artical"
-        multiline
-        rows={4}
-        maxRows={10}
-        defaultValue=""
-        variant="outlined"
-        sx={{
-          width: '100%',
-          height: '100%'
-        }}
-      />
+      {loading && (
+        <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+          <CircularProgress />
+        </Box>
+      )}
+      {loading || content=== '' ? null : (
+        <InputAdornment position="end">
+          <TextField
+            multiline
+            rows={10}
+            defaultValue={content}
+            variant="outlined"
+            sx={{
+              width: '100%',
+              height: '100%'
+            }}
+            disabled={loading}
+          />
+          <IconButton onClick={handleCopy}>
+            <ContentCopy />
+          </IconButton>
+        </InputAdornment>
+      )}
     </Box>
+      
   );
 };
 
